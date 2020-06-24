@@ -1,0 +1,6 @@
+pandas
+jupyter
+torch
+torchvision
+scikit-learn
+pytorch-lightning
