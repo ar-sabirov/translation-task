@@ -50,15 +50,6 @@ class LightningSystem(pl.LightningModule):
         self.dataset = CompanyDataset(data_path=self.data_path,
                                       transform=self.transforms,
                                       nrows=10000)
-        n_splits = 1
-        train_size = 0.8
-        gs_split = GroupShuffleSplit(n_splits=n_splits, train_size=train_size)
-
-        train_indicies, val_indicies = list(gs_split.split(
-            self.dataset, groups=self.dataset.groups))[0]
-
-        self.train_sampler = SubsetRandomSampler(train_indicies)
-        self.val_sampler = SubsetRandomSampler(val_indicies)
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
@@ -109,7 +100,6 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.dataset,
             collate_fn=self.collate_fn,
-            sampler=self.train_sampler,
             batch_size=self.batch_size)
 
     @pl.data_loader
@@ -117,7 +107,6 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.dataset,
             collate_fn=self.collate_fn,
-            sampler=self.val_sampler,
             batch_size=self.batch_size)
 
     # @pl.data_loader
