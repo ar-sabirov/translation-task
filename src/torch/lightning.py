@@ -26,7 +26,7 @@ class LightningSystem(pl.LightningModule):
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
 
-        self.criterion = torch.nn.modules.loss.BCELoss()
+        self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss()
         #self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(params=model.parameters())
         #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
