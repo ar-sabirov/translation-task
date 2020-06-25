@@ -22,7 +22,6 @@ class LightningSystem(pl.LightningModule):
                  transforms=[],
                  batch_size: int = 16,
                  shuffle: bool = False,
-                 num_workers: int = 1,
                  collate_fn=None):
         pl.LightningModule.__init__(self)
         self.model = model
@@ -100,6 +99,7 @@ class LightningSystem(pl.LightningModule):
         # REQUIRED
         return DataLoader(
             self.dataset,
+            num_workers=0,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
@@ -107,6 +107,7 @@ class LightningSystem(pl.LightningModule):
     def val_dataloader(self):
         return DataLoader(
             self.dataset,
+            num_workers=0,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
