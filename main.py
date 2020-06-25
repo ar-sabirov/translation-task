@@ -1,4 +1,5 @@
 from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import EarlyStopping
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision.transforms import Compose
@@ -11,12 +12,20 @@ from src.transforms import OneHotCharacters, Tokenize
 if __name__ == "__main__":
     trf = [Tokenize(), OneHotCharacters()]
 
-    ds = CompanyDataset(data_path='/Users/ar_sabirov/2-Data/kontur_test/test_task/train_data.tsv',
+    ds = CompanyDataset(data_path='/root/2-Data/train_data.tsv',
                         transform=Compose(trf),
                         nrows=10000)
 
     n_splits = 1
     train_size = 0.8
+    
+    early_stop_callback = EarlyStopping(
+        monitor='val_Accuracy',
+        min_delta=0.00,
+        patience=3,
+        verbose=False,
+        mode='max'
+    )
 
     gs_split = GroupShuffleSplit(n_splits=n_splits, train_size=train_size)
 
@@ -31,12 +40,14 @@ if __name__ == "__main__":
                                  train_dataset=ds,
                                  val_dataset=ds,
                                  num_classes=1,
-                                 batch_size=1024,
+                                 batch_size=512,
                                  collate_fn=PaddingCollateFn(),
                                  train_sampler=train_sampler,
                                  val_sampler=val_sampler)
 
         trainer = Trainer(log_save_interval=10,
+                          gpus=[0],
+                          #early_stop_callback=early_stop_callback,
                           #precision=16,
                           #auto_scale_batch_size=True
                           )
