@@ -87,7 +87,7 @@ class LightningSystem(pl.LightningModule):
         return {'val_loss': avg_loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
-        return torch.optim.Adam(params=model.parameters())
+        return torch.optim.Adam(params=self.parameters())
 
     @pl.data_loader
     def train_dataloader(self):
