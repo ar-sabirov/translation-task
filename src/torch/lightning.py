@@ -2,9 +2,14 @@ from typing import Optional
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.metrics.classification import (F1, Accuracy,
-                                                      Precision, Recall)
+from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
+                                                      Recall)
+from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
+from torch.utils.data.sampler import SubsetRandomSampler
+from torchvision.transforms import Compose
+
+from src.dataset import CompanyDataset
 
 
 class LightningSystem(pl.LightningModule):
@@ -12,19 +17,16 @@ class LightningSystem(pl.LightningModule):
     def __init__(self,
                  model: torch.nn.Module,
                  num_classes: int,
-                 train_dataset: torch.utils.data.Dataset,
-                 val_dataset: torch.utils.data.Dataset = None,
+                 data_path: str,
+                 transforms=[],
                  batch_size: int = 16,
                  shuffle: bool = False,
                  num_workers: int = 1,
-                 collate_fn=None,
-                 train_sampler: Optional[Sampler] = None,
-                 val_sampler: Optional[Sampler] = None,
-                 test_sampler: Optional[Sampler] = None):
+                 collate_fn=None):
         pl.LightningModule.__init__(self)
         self.model = model
-        self.train_dataset = train_dataset
-        self.val_dataset = val_dataset
+        self.data_path = data_path
+        self.transforms = Compose(transforms)
 
         self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss()
         #self.criterion = torch.nn.CrossEntropyLoss()
@@ -42,9 +44,21 @@ class LightningSystem(pl.LightningModule):
         self.shuffle = shuffle
 
         self.collate_fn = collate_fn
-        self.train_sampler = train_sampler
-        self.val_sampler = val_sampler
-        self.test_sampler = test_sampler
+
+    def prepare_data(self):
+
+        self.dataset = CompanyDataset(data_path=self.data_path,
+                                      transform=self.transforms,
+                                      nrows=10000)
+        n_splits = 1
+        train_size = 0.8
+        gs_split = GroupShuffleSplit(n_splits=n_splits, train_size=train_size)
+
+        train_indicies, val_indicies = list(gs_split.split(
+            self.dataset, groups=self.dataset.groups))[0]
+
+        self.train_sampler = SubsetRandomSampler(train_indicies)
+        self.val_sampler = SubsetRandomSampler(val_indicies)
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
@@ -93,7 +107,7 @@ class LightningSystem(pl.LightningModule):
     def train_dataloader(self):
         # REQUIRED
         return DataLoader(
-            self.train_dataset,
+            self.dataset,
             collate_fn=self.collate_fn,
             sampler=self.train_sampler,
             batch_size=self.batch_size)
@@ -101,7 +115,7 @@ class LightningSystem(pl.LightningModule):
     @pl.data_loader
     def val_dataloader(self):
         return DataLoader(
-            self.val_dataset,
+            self.dataset,
             collate_fn=self.collate_fn,
             sampler=self.val_sampler,
             batch_size=self.batch_size)
