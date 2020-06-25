@@ -46,8 +46,7 @@ class LightningSystem(pl.LightningModule):
         self.shuffle = shuffle
 
         self.collate_fn = collate_fn
-
-    def prepare_data(self):
+        
         self.dataset = CompanyDataset(data_path=self.data_path,
                                       transform=self.transforms)
 
