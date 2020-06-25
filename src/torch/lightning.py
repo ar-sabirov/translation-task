@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 import torch
 # from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
 #                                                       Recall)
+from pytorch_lightning.metrics import Accuracy
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -34,13 +35,13 @@ class LightningSystem(pl.LightningModule):
         #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
 
         #self.train_metrics = [Accuracy(num_classes=num_classes)]
-        self.train_metrics = []
+        self.train_metrics = [Accuracy(num_classes=num_classes)]
         # self.val_metrics = [
         #     Accuracy(num_classes=num_classes),
         #     F1(),
         #     Precision(),
         #     Recall()]
-        self.val_metrics = []
+        self.val_metrics = [Accuracy(num_classes=num_classes)]
 
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -48,10 +49,8 @@ class LightningSystem(pl.LightningModule):
         self.collate_fn = collate_fn
 
     def prepare_data(self):
-
         self.dataset = CompanyDataset(data_path=self.data_path,
-                                      transform=self.transforms,
-                                      nrows=10000)
+                                      transform=self.transforms)
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
