@@ -11,7 +11,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision.transforms import Compose
 
 from src.dataset import CompanyDataset
-
+from src.util import f1_score
 
 class LightningSystem(pl.LightningModule):
 
@@ -93,11 +93,11 @@ class LightningSystem(pl.LightningModule):
         #val_metrics = self.calc_metrics(y_hat, labels, self.val_metrics, 'val')
         
         preds = (y_hat > 0.5).to(dtype=torch.float)
-        f1_score = f1_score(labels, preds)
+        f1_s = f1_score(labels, preds)
 
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
 
-        tensorboard_logs = {'val_loss': avg_loss, 'f1': f1_score}
+        tensorboard_logs = {'val_loss': avg_loss, 'f1': f1_s}
         return {'val_loss': avg_loss,
                 'log': tensorboard_logs}
 
@@ -127,17 +127,3 @@ class LightningSystem(pl.LightningModule):
     #         self.dataset,
     #         sampler=self.test_sampler,
     #         batch_size=self.batch_size)def calc_metrics(y_hat, labels, metrics, prefix):
-
-def f1_score(y_true, y_pred) -> torch.Tensor:
-    tp = (y_true * y_pred).sum().to(torch.float)
-    tn = ((1 - y_true) * (1 - y_pred)).sum().to(torch.float)
-    fp = ((1 - y_true) * y_pred).sum().to(torch.float)
-    fn = (y_true * (1 - y_pred)).sum().to(torch.float)
-    
-    epsilon = 1e-7
-    
-    precision = tp / (tp + fp + epsilon)
-    recall = tp / (tp + fn + epsilon)
-    
-    f1 = 2* (precision*recall) / (precision + recall + epsilon)
-    return f1
