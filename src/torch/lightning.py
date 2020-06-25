@@ -2,8 +2,8 @@ from typing import Optional
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
-                                                      Recall)
+from pytorch_lightning.metrics.classification import (AUROC, F1, Accuracy,
+                                                      Precision, Recall)
 from torch.utils.data import DataLoader, Sampler
 
 
@@ -33,7 +33,11 @@ class LightningSystem(pl.LightningModule):
 
         self.train_metrics = [Accuracy(num_classes=num_classes)]
         self.val_metrics = [
-            Accuracy(num_classes=num_classes), F1(), Precision(), Recall()]
+            Accuracy(num_classes=num_classes),
+            AUROC(),
+            F1(),
+            Precision(),
+            Recall()]
 
         self.batch_size = batch_size
         self.shuffle = shuffle
