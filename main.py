@@ -25,10 +25,11 @@ if __name__ == "__main__":
                              num_workers=0,
                              transforms=transforms,
                              num_classes=2,
-                             batch_size=128,
+                             batch_size=1024,
                              collate_fn=PaddingCollateFn())
 
     trainer = Trainer(log_save_interval=10,
+                      # distributed_backend='ddp',
                       # gpus=[0],
                       # fast_dev_run=True,
                       # early_stop_callback=early_stop_callback,
