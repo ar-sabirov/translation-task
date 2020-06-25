@@ -34,9 +34,13 @@ class CompanyDataset(Dataset):
 
 class PaddingCollateFn:
     def __call__(self, batch):
+        
+        def min_power_2(x: int) -> int:
+            x = int(x)
+            return 1 << (x-1).bit_length()
 
         def pad_batch_with_zeros(l):
-            max_len = max([len(i) for i in l])
+            max_len = min_power_2(max([len(i) for i in l]))
             batch_size = len(l)
             sample_size = l[0].size()[1]
 
