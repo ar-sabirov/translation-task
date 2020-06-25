@@ -1,77 +1,105 @@
-import pytorch_lightning as pl
-
-import torch
 from typing import Optional
 
+import pytorch_lightning as pl
+import torch
+from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
+                                                      Recall)
 from torch.utils.data import DataLoader, Sampler
 
 
 class LightningSystem(pl.LightningModule):
 
-    def __init__(self, 
+    def __init__(self,
                  model: torch.nn.Module,
-                 dataset: torch.utils.data.Dataset,
-                 batch_size: int = 64,
-                 criterion: Optional[torch.nn.Module] = None,
-                 optimizer: Optional[torch.optim.Optimizer] = None,
-                 scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None,
+                 num_classes: int,
+                 train_dataset: torch.utils.data.Dataset,
+                 val_dataset: torch.utils.data.Dataset = None,
+                 batch_size: int = 16,
+                 shuffle: bool = False,
+                 num_workers: int = 1,
+                 collate_fn=None,
                  train_sampler: Optional[Sampler] = None,
                  val_sampler: Optional[Sampler] = None,
                  test_sampler: Optional[Sampler] = None):
         pl.LightningModule.__init__(self)
         self.model = model
-        self.dataset = dataset
-        
+        self.train_dataset = train_dataset
+        self.val_dataset = val_dataset
+
         self.criterion = torch.nn.modules.loss.BCELoss()
-        #self.optimizer = optimizer if optimizer else torch.optim.Adam(params=model.parameters())
-        self.scheduler = scheduler
-        
+        #self.criterion = torch.nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(params=model.parameters())
+        #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
+
+        self.train_metrics = [Accuracy(num_classes=num_classes)]
+        self.val_metrics = [
+            Accuracy(num_classes=num_classes), F1(), Precision(), Recall()]
+
         self.batch_size = batch_size
-        
+        self.shuffle = shuffle
+
+        self.collate_fn = collate_fn
         self.train_sampler = train_sampler
         self.val_sampler = val_sampler
         self.test_sampler = test_sampler
-        
-    def forward(self, batch) -> torch.Tensor:
-        return self.model.forward(batch['ru_name'], batch['eng_name'])
-    
+
+    @staticmethod
+    def calc_metrics(y_hat, labels, metrics, prefix):
+        return {f'{prefix}_{metric._get_name()}': metric(y_hat, labels) for metric in metrics}
+
+    def forward(self, inputs) -> torch.Tensor:
+        return self.model.forward(inputs)
+
     def training_step(self,
                       batch,
                       batch_idx: int):
         # REQUIRED
-        y_hat = self.forward(batch).squeeze()
-        loss = self.criterion(y_hat, batch['label'])
+        inputs, labels = batch
+        y_hat = self.forward(inputs).squeeze()
+        loss = self.criterion(y_hat, labels)
 
-        tensorboard_logs = {'train_loss': loss}
-        return {'loss': loss, 'log': tensorboard_logs}
-    
+        train_metrics = self.calc_metrics(
+            y_hat, labels, self.train_metrics, 'train')
+
+        tensorboard_logs = {**{'train_loss': loss}, **train_metrics}
+
+        return {'loss': loss,
+                'log': tensorboard_logs}
+
     def validation_step(self, batch, batch_idx):
-        y_hat = self.forward(batch).squeeze()
-        loss = self.criterion(y_hat, batch['label'])
-        return {'val_loss': loss}
-    
+        inputs, labels = batch
+        y_hat = self.forward(inputs).squeeze()
+        loss = self.criterion(y_hat, labels)
+        return {'val_loss': loss, 'labels': labels, 'preds': y_hat}
+
     def validation_epoch_end(self, outputs):
+        labels = torch.cat([x['labels'] for x in outputs])
+        y_hat = torch.cat([x['preds'] for x in outputs])
+
+        val_metrics = self.calc_metrics(y_hat, labels, self.val_metrics, 'val')
+
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        tensorboard_logs = {'val_loss': avg_loss}
-        return {'val_loss': avg_loss, 'log': tensorboard_logs}    
-    
+
+        tensorboard_logs = {**{'val_loss': avg_loss}, **val_metrics}
+        return {'val_loss': avg_loss, 'log': tensorboard_logs}
+
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.02)
-    
+        return self.optimizer
+
     @pl.data_loader
     def train_dataloader(self):
         # REQUIRED
         return DataLoader(
-            self.dataset,
-            collate_fn=PaddingCollateFn(),
+            self.train_dataset,
+            collate_fn=self.collate_fn,
             sampler=self.train_sampler,
             batch_size=self.batch_size)
 
     @pl.data_loader
     def val_dataloader(self):
         return DataLoader(
-            self.dataset,
-            collate_fn=PaddingCollateFn(),
+            self.val_dataset,
+            collate_fn=self.collate_fn,
             sampler=self.val_sampler,
             batch_size=self.batch_size)
 
@@ -80,34 +108,4 @@ class LightningSystem(pl.LightningModule):
     #     return DataLoader(
     #         self.dataset,
     #         sampler=self.test_sampler,
-    #         batch_size=self.batch_size)
-    
-    
-class PaddingCollateFn:    
-    def __call__(self, batch):
-        
-        def pad_batch_with_zeros(l):
-            max_len = max([len(i) for i in l])
-            batch_size = len(l)
-            sample_size = l[0].size()[1]
-                
-            out = torch.zeros((batch_size, max_len, sample_size))
-                
-            for i, t in enumerate(l):
-                out[i, :l[i].size()[0], :] = l[i]
-                
-            return out
-        
-        ru_names = [item['ru_name'] for item in batch]
-        en_names = [item['eng_name'] for item in batch]
-        labels = [item['label'] for item in batch]
-        
-        ru_names = pad_batch_with_zeros(ru_names)
-        en_names = pad_batch_with_zeros(en_names)
-        labels = torch.tensor(labels, dtype=torch.float)
-        
-        items = {'ru_name': ru_names,
-                  'eng_name': en_names,
-                  'label': labels}
-
-        return items
+    #         batch_size=self.batch_size)def calc_metrics(y_hat, labels, metrics, prefix):

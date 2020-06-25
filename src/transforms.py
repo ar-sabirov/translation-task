@@ -1,4 +1,3 @@
-import nltk
 from nltk.tokenize import RegexpTokenizer
 
 import torch
@@ -60,17 +59,3 @@ def _get_vocab():
     letters = [' ёЁ_'] + [get_chars(a, b) for a, b in bounds]
 
     return {a: i for i, a in enumerate(''.join(letters))}
-
-if __name__ == "__main__":
-    # s = {'ru_name': 'товарищество с ограниченной ответственностью 123 производственно-коммерческая фирма "корн+" ltd',
-    #     'eng_name': 'Omg wtf',
-    #     'label': 1}
-    
-    # t = Tokenize()
-    
-    # a = t(s)
-    
-    # oh = OneHotCharacters()
-    
-    # oh(a)
-    v = _get_vocab()
