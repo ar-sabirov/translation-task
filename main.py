@@ -29,7 +29,11 @@ if __name__ == "__main__":
     
     model = RNN()
     
-    system = LightningSystem(model=model, dataset=ds)
+    system = LightningSystem(model=model,
+                             dataset=ds,
+                             batch_size=128,
+                             train_sampler=train_sampler,
+                             val_sampler=val_sampler)
     
     trainer = Trainer()
     
