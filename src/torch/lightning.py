@@ -18,6 +18,7 @@ class LightningSystem(pl.LightningModule):
     def __init__(self,
                  model: torch.nn.Module,
                  num_classes: int,
+                 num_workers: int,
                  data_path: str,
                  transforms=[],
                  batch_size: int = 16,
@@ -41,6 +42,8 @@ class LightningSystem(pl.LightningModule):
         #     Precision(),
         #     Recall()]
         self.val_metrics = []
+        
+        self.num_workers = num_workers
 
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -98,7 +101,7 @@ class LightningSystem(pl.LightningModule):
         # REQUIRED
         return DataLoader(
             self.dataset,
-            num_workers=0,
+            num_workers=self.num_workers,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
@@ -106,7 +109,7 @@ class LightningSystem(pl.LightningModule):
     def val_dataloader(self):
         return DataLoader(
             self.dataset,
-            num_workers=0,
+            num_workers=self.num_workers,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
