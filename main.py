@@ -20,7 +20,9 @@ if __name__ == "__main__":
     model = RNN()
 
     system = LightningSystem(model=model,
-                             data_path='/Users/ar_sabirov/2-Data/kontur_test/test_task/train_data.tsv',
+                             train_data_path='/Users/ar_sabirov/2-Data/kontur_test/train_subs.tsv',
+                             val_data_path='/Users/ar_sabirov/2-Data/kontur_test/val_subs.tsv',
+                             num_workers=0,
                              transforms=transforms,
                              num_classes=2,
                              batch_size=128,

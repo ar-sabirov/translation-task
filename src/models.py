@@ -31,9 +31,9 @@ class RNN(torch.nn.Module):
         grus_out = torch.cat([ru_gru, en_gru], dim=1)
 
         linear1 = self.linear1(grus_out)
-        linear2 = self.linear2(linear1)
+        output = self.linear2(linear1)
 
-        output = torch.sigmoid(linear2)
+        #output = torch.sigmoid(linear2)
 
         return output
 
