@@ -13,8 +13,7 @@ if __name__ == "__main__":
     trf = [Tokenize(), OneHotCharacters()]
 
     ds = CompanyDataset(data_path='/root/2-Data/train_data.tsv',
-                        transform=Compose(trf),
-                        nrows=10000)
+                        transform=Compose(trf))
 
     n_splits = 1
     train_size = 0.8
@@ -48,8 +47,8 @@ if __name__ == "__main__":
         trainer = Trainer(log_save_interval=10,
                           gpus=[0],
                           #early_stop_callback=early_stop_callback,
-                          #precision=16,
-                          #auto_scale_batch_size=True
+                          precision=16,
+                          auto_scale_batch_size=True
                           )
 
         trainer.fit(system)
