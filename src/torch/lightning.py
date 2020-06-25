@@ -2,8 +2,8 @@ from typing import Optional
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
-                                                      Recall)
+# from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
+#                                                       Recall)
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -33,12 +33,14 @@ class LightningSystem(pl.LightningModule):
         #self.optimizer = torch.optim.Adam(params=model.parameters())
         #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
 
-        self.train_metrics = [Accuracy(num_classes=num_classes)]
-        self.val_metrics = [
-            Accuracy(num_classes=num_classes),
-            F1(),
-            Precision(),
-            Recall()]
+        #self.train_metrics = [Accuracy(num_classes=num_classes)]
+        self.train_metrics = []
+        # self.val_metrics = [
+        #     Accuracy(num_classes=num_classes),
+        #     F1(),
+        #     Precision(),
+        #     Recall()]
+        self.val_metrics = []
 
         self.batch_size = batch_size
         self.shuffle = shuffle
