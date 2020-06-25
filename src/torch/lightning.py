@@ -28,7 +28,7 @@ class LightningSystem(pl.LightningModule):
 
         self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss()
         #self.criterion = torch.nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(params=model.parameters())
+        #self.optimizer = torch.optim.Adam(params=model.parameters())
         #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
 
         self.train_metrics = [Accuracy(num_classes=num_classes)]
@@ -87,7 +87,7 @@ class LightningSystem(pl.LightningModule):
         return {'val_loss': avg_loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
-        return self.optimizer
+        return torch.optim.Adam(params=model.parameters())
 
     @pl.data_loader
     def train_dataloader(self):
