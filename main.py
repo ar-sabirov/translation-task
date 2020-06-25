@@ -46,6 +46,7 @@ if __name__ == "__main__":
 
         trainer = Trainer(log_save_interval=10,
                           gpus=[0],
+                          fast_dev_run=True,
                           #early_stop_callback=early_stop_callback,
                           precision=16,
                           auto_scale_batch_size=True
