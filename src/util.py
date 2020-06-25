@@ -1,3 +1,5 @@
+import torch
+
 def f1_score(y_true, y_pred):
     tp = (y_true * y_pred).sum().to(torch.float)
     tn = ((1 - y_true) * (1 - y_pred)).sum().to(torch.float)
