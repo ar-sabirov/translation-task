@@ -35,7 +35,7 @@ class LightningSystem(pl.LightningModule):
         #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
 
         #self.train_metrics = [Accuracy(num_classes=num_classes)]
-        self.train_metrics = [Accuracy(num_classes=num_classes)]
+        self.train_metrics = []
         # self.val_metrics = [
         #     Accuracy(num_classes=num_classes),
         #     F1(),
