@@ -5,37 +5,36 @@ class RNN(torch.nn.Module):
     def __init__(self):
         torch.nn.Module.__init__(self)
         input_size = 130
-        hidden_size = 10
+        hidden_size = 20
         num_layers = 1
-        self.ru_gru = torch.nn.GRU(input_size,
+        self.rnn1 = torch.nn.LSTM(input_size,
                                    hidden_size,
                                    num_layers,
+                                   bidirectional=True,
                                    batch_first=True)
 
-        self.en_gru = torch.nn.GRU(input_size,
+        self.rnn2 = torch.nn.LSTM(input_size,
                                    hidden_size,
                                    num_layers,
+                                   bidirectional=True,
                                    batch_first=True)
 
-        self.linear1 = torch.nn.Linear(2 * hidden_size, 20)
-        self.linear2 = torch.nn.Linear(20, 1)
+        self.linear1 = torch.nn.Linear(2 * hidden_size, 10)
+        self.linear2 = torch.nn.Linear(10, 1)
 
     def forward(self, x):
         ru, en = x
-        ru_gru, _ = self.ru_gru(ru)
-        en_gru, _ = self.en_gru(en)
+        _, (ht1, _) = self.rnn1(ru)
+        _, (ht2, _) = self.rnn2(en)
 
-        ru_gru = ru_gru.squeeze()[:, -1, :]
-        en_gru = en_gru.squeeze()[:, -1, :]
-
-        grus_out = torch.cat([ru_gru, en_gru], dim=1)
+        grus_out = torch.cat([ht1[-1], ht2[-1]], dim=1)
 
         linear1 = self.linear1(grus_out)
-        output = self.linear2(linear1)
+        linear2 = self.linear2(linear1)
 
         #output = torch.sigmoid(linear2)
 
-        return output
+        return linear2
 
 # class Net(torch.nn.Module):
 #     def __init__(self):
