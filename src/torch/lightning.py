@@ -28,7 +28,7 @@ class LightningSystem(pl.LightningModule):
         self.model = model
         self.transforms = Compose(transforms)
 
-        #weight = torch.tensor([1., 21.], dtype=torch.float)        
+        #weight = torch.tensor([1., 21.], dtype=torch.float)
         self.criterion = torch.nn.BCELoss()
         #self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss(weight=weights)
         #self.criterion = torch.nn.CrossEntropyLoss()
@@ -42,7 +42,7 @@ class LightningSystem(pl.LightningModule):
             F1(),
             Precision(),
             Recall()]
-        
+
         self.num_workers = num_workers
 
         self.batch_size = batch_size
@@ -53,13 +53,13 @@ class LightningSystem(pl.LightningModule):
         self.train_dataset = CompanyDataset(data_path=train_data_path,
                                             transform=self.transforms)
         self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
-                                                   num_samples=self.batch_size)
+                                                   num_samples=len(self.train_dataset.weights))
 
 
         self.val_dataset = CompanyDataset(data_path=val_data_path,
                                           transform=self.transforms)
         self.val_sampler = WeightedRandomSampler(weights=self.val_dataset.weights,
-                                                 num_samples=self.batch_size)
+                                                 num_samples=len(self.train_dataset.weights))
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
@@ -88,7 +88,7 @@ class LightningSystem(pl.LightningModule):
         inputs, labels = batch
         y_hat = self.forward(inputs)
         loss = self.criterion(y_hat, labels)
-        
+
         return {'val_loss': loss, 'labels': labels, 'preds': y_hat}
 
     def validation_epoch_end(self, outputs):
@@ -97,7 +97,8 @@ class LightningSystem(pl.LightningModule):
 
         preds = (y_hat > 0.5).to(dtype=torch.long)
 
-        val_metrics = self.calc_metrics(preds, labels.to(torch.long), self.val_metrics, 'val')
+        val_metrics = self.calc_metrics(
+            preds, labels.to(torch.long), self.val_metrics, 'val')
 
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
 
