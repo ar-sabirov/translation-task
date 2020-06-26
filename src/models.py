@@ -20,7 +20,7 @@ class RNN(torch.nn.Module):
                                    batch_first=True)
 
         self.linear1 = torch.nn.Linear(2 * hidden_size, 10)
-        self.linear2 = torch.nn.Linear(10, 1)
+        self.linear2 = torch.nn.Linear(10, 2)
 
     def forward(self, x):
         ru, en = x
@@ -32,9 +32,9 @@ class RNN(torch.nn.Module):
         linear1 = self.linear1(grus_out)
         linear2 = self.linear2(linear1)
 
-        #output = torch.sigmoid(linear2)
+        output = torch.log_softmax(linear2, 1)
 
-        return linear2
+        return output
 
 # class Net(torch.nn.Module):
 #     def __init__(self):

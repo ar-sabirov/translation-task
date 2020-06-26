@@ -29,8 +29,8 @@ class LightningSystem(pl.LightningModule):
         self.model = model
         self.transforms = Compose(transforms)
 
-        pos_weight = torch.tensor([21.], dtype=torch.float)        
-        self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss(pos_weight=pos_weight)
+        weight = torch.tensor([1., 21.], dtype=torch.float)        
+        self.criterion = torch.nn.NLLLoss(weight=weight)
         #self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss(weight=weights)
         #self.criterion = torch.nn.CrossEntropyLoss()
         #self.optimizer = torch.optim.Adam(params=model.parameters())
@@ -94,7 +94,7 @@ class LightningSystem(pl.LightningModule):
 
         #val_metrics = self.calc_metrics(y_hat, labels, self.val_metrics, 'val')
         
-        preds = (y_hat > 0.5).to(dtype=torch.float)
+        preds = y_hat.argmax(1)
         f1_s = f1_score(labels, preds)
 
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
