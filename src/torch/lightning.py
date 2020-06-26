@@ -2,13 +2,15 @@ from typing import Optional
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision, Recall)
+from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
+                                                      Recall)
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data.sampler import WeightedRandomSampler
 from torchvision.transforms import Compose
 
 from src.dataset import CompanyDataset
+
 
 class LightningSystem(pl.LightningModule):
 
@@ -50,23 +52,28 @@ class LightningSystem(pl.LightningModule):
         
         self.train_dataset = CompanyDataset(data_path=train_data_path,
                                             transform=self.transforms)
-        
+        self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
+                                                   num_samples=self.batch_size)
+
+
         self.val_dataset = CompanyDataset(data_path=val_data_path,
                                           transform=self.transforms)
+        self.val_sampler = WeightedRandomSampler(weights=self.val_dataset.weights,
+                                                 num_samples=self.batch_size)
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
         return {f'{prefix}_{metric._get_name()}': metric(y_hat, labels) for metric in metrics}
 
     def forward(self, inputs) -> torch.Tensor:
-        return self.model.forward(inputs)
+        return self.model.forward(inputs).squeeze()
 
     def training_step(self,
                       batch,
                       batch_idx: int):
         # REQUIRED
         inputs, labels = batch
-        y_hat = self.forward(inputs).squeeze()
+        y_hat = self.forward(inputs)
         loss = self.criterion(y_hat, labels)
 
         train_metrics = self.calc_metrics(
@@ -79,7 +86,7 @@ class LightningSystem(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         inputs, labels = batch
-        y_hat = self.forward(inputs).squeeze()
+        y_hat = self.forward(inputs)
         loss = self.criterion(y_hat, labels)
         
         return {'val_loss': loss, 'labels': labels, 'preds': y_hat}
@@ -107,6 +114,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.train_dataset,
             num_workers=self.num_workers,
+            sampler=self.train_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
@@ -115,6 +123,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.val_dataset,
             num_workers=self.num_workers,
+            sampler=self.val_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 

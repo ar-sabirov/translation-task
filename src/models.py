@@ -4,7 +4,7 @@ import torch
 class RNN(torch.nn.Module):
     def __init__(self):
         torch.nn.Module.__init__(self)
-        input_size = 130
+        input_size = 71
         hidden_size = 20
         num_layers = 1
         fc_size = 10

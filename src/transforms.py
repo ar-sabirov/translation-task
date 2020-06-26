@@ -2,6 +2,13 @@ from nltk.tokenize import RegexpTokenizer
 
 import torch
 
+class Lower(object):
+    def __call__(self, sample):
+        ru_name, eng_name, label = sample['ru_name'], sample['eng_name'], sample['label']
+        return {'ru_name': ru_name.lower(),
+                'eng_name': eng_name.lower(),
+                'label': label}
+
 
 class Tokenize(object):
 
@@ -54,8 +61,8 @@ def _get_vocab():
         u = ord(upper)
         return ''.join([chr(i) for i in range(l, u+1)])
 
-    bounds = [('А', 'Я'), ('а', 'я'), ('A', 'Z'), ('a', 'z'), ('0', '9')]
+    bounds = [('а', 'я'), ('a', 'z'), ('0', '9')]
 
-    letters = [' ёЁ_'] + [get_chars(a, b) for a, b in bounds]
+    letters = [' ё_'] + [get_chars(a, b) for a, b in bounds]
 
     return {a: i for i, a in enumerate(''.join(letters))}

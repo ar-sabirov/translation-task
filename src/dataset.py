@@ -14,6 +14,10 @@ class CompanyDataset(Dataset):
         self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=nrows)
         self.transform = transform
         self.groups = self.df['eng_name']
+        
+        pos_weight = len(self.df.answer) / self.df.answer.sum()
+        weights = (self.df.answer * pos_weight) + ~self.df.answer
+        self.weights = torch.from_numpy(weights.values)
 
     def __len__(self):
         return len(self.df)
