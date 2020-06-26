@@ -29,7 +29,9 @@ class LightningSystem(pl.LightningModule):
         self.model = model
         self.transforms = Compose(transforms)
 
-        self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss()
+        pos_weight = torch.tensor([21.], dtype=torch.float)        
+        self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss(pos_weight=pos_weight)
+        #self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss(weight=weights)
         #self.criterion = torch.nn.CrossEntropyLoss()
         #self.optimizer = torch.optim.Adam(params=model.parameters())
         #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
