@@ -32,7 +32,7 @@ class RNN(torch.nn.Module):
         linear1 = self.linear1(grus_out)
         linear2 = self.linear2(linear1)
 
-        output = torch.log_softmax(linear2, 1)
+        output = torch.softmax(linear2, 1)
 
         return output
 
