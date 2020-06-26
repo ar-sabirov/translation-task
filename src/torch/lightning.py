@@ -96,7 +96,7 @@ class LightningSystem(pl.LightningModule):
 
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
 
-        tensorboard_logs = {'val_loss': avg_loss, 'f1': f1_s}
+        tensorboard_logs = {**{'val_loss': avg_loss}, **val_metrics}
         return {'val_loss': avg_loss,
                 'log': tensorboard_logs}
 
