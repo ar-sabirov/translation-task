@@ -20,22 +20,22 @@ class LightningSystem(pl.LightningModule):
                  num_workers: int,
                  train_data_path: str,
                  val_data_path: str,
+                 loss,
+                 optimizer,
+                 optimizer_args,
+                 scheduler,
+                 scheduler_args,
                  transforms=[],
                  batch_size: int = 16,
-                 shuffle: bool = False,
                  collate_fn=None):
         pl.LightningModule.__init__(self)
         self.model = model
         self.transforms = Compose(transforms)
 
-        #weight = torch.tensor([1., 21.], dtype=torch.float)
-        self.criterion = torch.nn.BCELoss()
-        #self.criterion = torch.nn.modules.loss.BCEWithLogitsLoss(weight=weights)
-        #self.criterion = torch.nn.CrossEntropyLoss()
-        #self.optimizer = torch.optim.Adam(params=model.parameters())
-        #self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
+        self.criterion = loss()
+        self.optimizer = optimizer(self.parameters(), **optimizer_args)
+        self.scheduler = scheduler(self.optimizer, **scheduler_args)
 
-        #self.train_metrics = [Accuracy(num_classes=num_classes)]
         self.train_metrics = []
         self.val_metrics = [
             Accuracy(num_classes=num_classes),
@@ -46,7 +46,6 @@ class LightningSystem(pl.LightningModule):
         self.num_workers = num_workers
 
         self.batch_size = batch_size
-        self.shuffle = shuffle
 
         self.collate_fn = collate_fn
         
@@ -111,7 +110,7 @@ class LightningSystem(pl.LightningModule):
                 'log': tensorboard_logs}
 
     def configure_optimizers(self):
-        return torch.optim.Adam(params=self.parameters())
+        return [self.optimizer], [self.scheduler]
 
     @pl.data_loader
     def train_dataloader(self):

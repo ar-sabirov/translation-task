@@ -1,13 +1,15 @@
+import torch
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import EarlyStopping
+from torch.optim.lr_scheduler import StepLR
 
 from src.dataset import PaddingCollateFn
 from src.models import RNN
 from src.torch.lightning import LightningSystem
-from src.transforms import OneHotCharacters, Tokenize
+from src.transforms import Lower, OneHotCharacters, Tokenize
 
 if __name__ == "__main__":
-    transforms = [Tokenize(), OneHotCharacters()]
+    transforms = [Lower(), Tokenize(), OneHotCharacters()]
 
     # early_stop_callback = EarlyStopping(
     #     monitor='val_Accuracy',
@@ -17,24 +19,41 @@ if __name__ == "__main__":
     #     mode='max'
     # )
 
-    model = RNN()
+    model = RNN(input_size=71,
+                rnn_hidden_size=128,
+                rnn_num_layers=2,
+                fc_size=64,
+                output_size=1)
+
+    loss = torch.nn.BCELoss
+
+    optimizer, optimizer_args = torch.optim.Adam, {'lr': 0.1}
+
+    scheduler, scheduler_args = StepLR, {'step_size': 2, 'gamma': 0.1}
 
     system = LightningSystem(model=model,
                              train_data_path='/Users/ar_sabirov/2-Data/kontur_test/train_subs.tsv',
                              val_data_path='/Users/ar_sabirov/2-Data/kontur_test/val_subs.tsv',
+                             loss=loss,
+                             optimizer=optimizer,
+                             optimizer_args=optimizer_args,
+                             scheduler=scheduler,
+                             scheduler_args=scheduler_args,
                              num_workers=0,
                              transforms=transforms,
                              num_classes=2,
-                             batch_size=1024,
+                             batch_size=16,
                              collate_fn=PaddingCollateFn())
 
-    trainer = Trainer(log_save_interval=10,
-                      # distributed_backend='ddp',
-                      # gpus=[0],
-                      # fast_dev_run=True,
-                      # early_stop_callback=early_stop_callback,
-                      # precision=16,
-                      # auto_scale_batch_size=True
-                      )
+    trainer = Trainer(  # log_save_interval=10,
+        val_check_interval=10,
+        limit_val_batches=0.1,
+        # distributed_backend='ddp',
+        # gpus=[0],
+        # fast_dev_run=True,
+        # early_stop_callback=early_stop_callback,
+        # precision=16,
+        # auto_scale_batch_size=True
+    )
 
     trainer.fit(system)
