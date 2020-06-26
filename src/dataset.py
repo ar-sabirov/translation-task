@@ -18,6 +18,7 @@ class CompanyDataset(Dataset):
         pos_weight = len(self.df.answer) / self.df.answer.sum()
         weights = (self.df.answer * pos_weight) + ~self.df.answer
         self.weights = torch.from_numpy(weights.values)
+        self.n_pos_samples = int(self.df.answer.sum())
 
     def __len__(self):
         return len(self.df)

@@ -52,14 +52,18 @@ class LightningSystem(pl.LightningModule):
         
         self.train_dataset = CompanyDataset(data_path=train_data_path,
                                             transform=self.transforms)
+
         self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
-                                                   num_samples=len(self.train_dataset.weights))
+                                                   num_samples=2 * self.train_dataset.n_pos_samples,
+                                                   replacement=True)
 
 
         self.val_dataset = CompanyDataset(data_path=val_data_path,
                                           transform=self.transforms)
+
         self.val_sampler = WeightedRandomSampler(weights=self.val_dataset.weights,
-                                                 num_samples=len(self.train_dataset.weights))
+                                                 num_samples=2 * self.val_dataset.n_pos_samples,
+                                                 replacement=True)
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
