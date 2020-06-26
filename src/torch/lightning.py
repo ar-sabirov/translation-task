@@ -2,9 +2,7 @@ from typing import Optional
 
 import pytorch_lightning as pl
 import torch
-# from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
-#                                                       Recall)
-#from pytorch_lightning.metrics import Accuracy
+from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision, Recall)
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -38,12 +36,11 @@ class LightningSystem(pl.LightningModule):
 
         #self.train_metrics = [Accuracy(num_classes=num_classes)]
         self.train_metrics = []
-        # self.val_metrics = [
-        #     Accuracy(num_classes=num_classes),
-        #     F1(),
-        #     Precision(),
-        #     Recall()]
-        self.val_metrics = []
+        self.val_metrics = [
+            Accuracy(num_classes=num_classes),
+            F1(),
+            Precision(),
+            Recall()]
         
         self.num_workers = num_workers
 
@@ -92,7 +89,7 @@ class LightningSystem(pl.LightningModule):
         labels = torch.cat([x['labels'] for x in outputs])
         y_hat = torch.cat([x['preds'] for x in outputs])
 
-        #val_metrics = self.calc_metrics(y_hat, labels, self.val_metrics, 'val')
+        val_metrics = self.calc_metrics(y_hat, labels, self.val_metrics, 'val')
         
         preds = (y_hat > 0.5).to(dtype=torch.float)
         f1_s = f1_score(labels, preds)
