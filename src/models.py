@@ -7,32 +7,34 @@ class RNN(torch.nn.Module):
         input_size = 130
         hidden_size = 20
         num_layers = 1
+        fc_size = 10
+        output_size = 1
         self.rnn1 = torch.nn.LSTM(input_size,
                                    hidden_size,
                                    num_layers,
-                                   bidirectional=True,
+                                   #bidirectional=True,
                                    batch_first=True)
 
         self.rnn2 = torch.nn.LSTM(input_size,
                                    hidden_size,
                                    num_layers,
-                                   bidirectional=True,
+                                   #bidirectional=True,
                                    batch_first=True)
 
-        self.linear1 = torch.nn.Linear(2 * hidden_size, 10)
-        self.linear2 = torch.nn.Linear(10, 2)
+        self.linear1 = torch.nn.Linear(2 * hidden_size, fc_size)
+        self.linear2 = torch.nn.Linear(fc_size, output_size)
 
     def forward(self, x):
         ru, en = x
         _, (ht1, _) = self.rnn1(ru)
         _, (ht2, _) = self.rnn2(en)
 
-        grus_out = torch.cat([ht1[-1], ht2[-1]], dim=1)
+        grus_out = torch.cat([ht1, ht2], dim=2)
 
         linear1 = self.linear1(grus_out)
         linear2 = self.linear2(linear1)
 
-        output = torch.softmax(linear2, 1)
+        output = torch.sigmoid(linear2)
 
         return output
 

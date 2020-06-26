@@ -57,6 +57,6 @@ class PaddingCollateFn:
 
         ru_names = pad_batch_with_zeros(ru_names)
         en_names = pad_batch_with_zeros(en_names)
-        labels = torch.tensor(labels, dtype=torch.long)
+        labels = torch.tensor(labels, dtype=torch.float)
 
         return [[ru_names, en_names], labels]
