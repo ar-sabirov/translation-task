@@ -5,8 +5,8 @@ class RNN(torch.nn.Module):
     def __init__(self):
         torch.nn.Module.__init__(self)
         input_size = 130
-        hidden_size = 64
-        num_layers = 2
+        hidden_size = 10
+        num_layers = 1
         self.ru_gru = torch.nn.GRU(input_size,
                                    hidden_size,
                                    num_layers,
