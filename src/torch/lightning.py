@@ -9,7 +9,6 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision.transforms import Compose
 
 from src.dataset import CompanyDataset
-from src.util import f1_score
 
 class LightningSystem(pl.LightningModule):
 
@@ -89,10 +88,9 @@ class LightningSystem(pl.LightningModule):
         labels = torch.cat([x['labels'] for x in outputs])
         y_hat = torch.cat([x['preds'] for x in outputs])
 
-        val_metrics = self.calc_metrics(y_hat, labels, self.val_metrics, 'val')
-        
-        preds = (y_hat > 0.5).to(dtype=torch.float)
-        f1_s = f1_score(labels, preds)
+        preds = (y_hat > 0.5).to(dtype=torch.long)
+
+        val_metrics = self.calc_metrics(preds, labels.to(torch.long), self.val_metrics, 'val')
 
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
 
