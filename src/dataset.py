@@ -11,19 +11,32 @@ class CompanyDataset(Dataset):
                  data_path: str,
                  transform=None,
                  nrows: Optional[int] = None):
-        self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=nrows)
+        self.data_path = data_path
         self.transform = transform
-        self.groups = self.df['eng_name']
+        # self.groups = self.df['eng_name']
 
-        pos_weight = len(self.df.answer) / self.df.answer.sum()
-        weights = (self.df.answer * pos_weight) + ~self.df.answer
-        self.weights = torch.from_numpy(weights.values)
-        self.n_pos_samples = int(self.df.answer.sum())
+        #pos_weight = len(self.df.answer) / self.df.answer.sum()
+        
+        # weights = (self.df.answer * pos_weight) + ~self.df.answer
+        # self.weights = torch.from_numpy(weights.values)
+        # self.n_pos_samples = int(self.df.answer.sum())
+        
+        self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=10000)
+
+        self.len = len(pd.read_csv(self.data_path, sep='\t', index_col=0, usecols=[0]))
 
     def __len__(self):
-        return len(self.df)
+        return self.len
 
     def __getitem__(self, idx: int):
+        if idx not in self.df.index:
+            self.df = pd.read_csv(self.data_path,
+                                  sep='\t',
+                                  header=0,
+                                  index_col=0,
+                                  skiprows=range(1, idx),
+                                  nrows=10000)
+        
         sample = self.df.iloc[idx]
 
         ru_name, eng_name, label = sample['ru_name'], sample['eng_name'], sample['answer']

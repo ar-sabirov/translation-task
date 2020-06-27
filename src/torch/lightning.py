@@ -6,7 +6,7 @@ import torch
 #                                                       Recall)
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
-from torch.utils.data.sampler import WeightedRandomSampler
+#from torch.utils.data.sampler import WeightedRandomSampler
 from torchvision.transforms import Compose
 
 from src.dataset import CompanyDataset
@@ -53,9 +53,9 @@ class LightningSystem(pl.LightningModule):
         self.train_dataset = CompanyDataset(data_path=train_data_path,
                                             transform=self.transforms)
 
-        self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
-                                                   num_samples=2 * self.train_dataset.n_pos_samples,
-                                                   replacement=True)
+        # self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
+        #                                            num_samples=2 * self.train_dataset.n_pos_samples,
+        #                                            replacement=True)
 
 
         self.val_dataset = CompanyDataset(data_path=val_data_path,

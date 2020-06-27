@@ -34,8 +34,8 @@ if __name__ == "__main__":
     scheduler, scheduler_args = StepLR, {'step_size': 5, 'gamma': 0.5}
 
     system = LightningSystem(model=model,
-                             train_data_path='/root/train_subs.tsv',
-                             val_data_path='/root/val_subs.tsv',
+                             train_data_path='/root/train_subs1.tsv',
+                             val_data_path='/root/val_subs1.tsv',
                              loss=loss,
                              optimizer=optimizer,
                              optimizer_args=optimizer_args,
@@ -48,9 +48,9 @@ if __name__ == "__main__":
                              collate_fn=PaddingCollateFn())
 
     trainer = Trainer(
-        log_save_interval=1000,
-        row_log_interval=1000,
-        val_check_interval=1000,
+        # log_save_interval=1000,
+        # row_log_interval=1000,
+        # val_check_interval=1000,
         #limit_val_batches=0.1,
         # distributed_backend='ddp',
         #gpus=1,
