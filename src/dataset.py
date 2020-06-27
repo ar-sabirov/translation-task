@@ -14,7 +14,7 @@ class CompanyDataset(Dataset):
         self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=nrows)
         self.transform = transform
         self.groups = self.df['eng_name']
-        
+
         pos_weight = len(self.df.answer) / self.df.answer.sum()
         weights = (self.df.answer * pos_weight) + ~self.df.answer
         self.weights = torch.from_numpy(weights.values)
@@ -25,7 +25,7 @@ class CompanyDataset(Dataset):
 
     def __getitem__(self, idx: int):
         sample = self.df.iloc[idx]
-        
+
         ru_name, eng_name, label = sample['ru_name'], sample['eng_name'], sample['answer']
 
         sample = {'idx': idx,
@@ -41,24 +41,25 @@ class CompanyDataset(Dataset):
 
 class PaddingCollateFn:
     def __call__(self, batch):
-        
+
         def min_power_2(x: int) -> int:
             x = int(x)
             return 1 << (x-1).bit_length()
 
-        def pad_batch_with_zeros(l, max_len = None):
+        def pad_batch_with_zeros(l, max_len=None):
             if not max_len:
                 max_len = min_power_2(max([len(i) for i in l]))
 
             batch_size = len(l)
             sample_size = l[0].size()[1]
+            n_channels = 1
 
-            out = torch.zeros((batch_size, max_len, sample_size))
+            out = torch.zeros((batch_size, n_channels, max_len, sample_size))
 
             for i, t in enumerate(l):
                 seq_len = l[i].shape[0]
                 seq_len = min(seq_len, max_len)
-                out[i, :seq_len, :] = l[i][:seq_len]
+                out[i, :, :seq_len, :] = l[i][:seq_len]
 
             return out
 
