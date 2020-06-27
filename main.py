@@ -4,7 +4,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 from torch.optim.lr_scheduler import StepLR
 
 from src.dataset import PaddingCollateFn
-from src.models import RNN, CompareModel
+from src.models import RNN, CompareModel, ChinatownModel
 from src.torch.lightning import LightningSystem
 from src.transforms import Lower, OneHotCharacters, Tokenize
 
@@ -25,13 +25,13 @@ if __name__ == "__main__":
     #             fc_size=64,
     #             output_size=1)
 
-    model = CompareModel()
+    model = ChinatownModel()
 
     loss = torch.nn.BCELoss
 
-    optimizer, optimizer_args = torch.optim.Adam, {'lr': 0.1}
+    optimizer, optimizer_args = torch.optim.SGD, {'lr': 0.01, 'momentum': 0.9}
 
-    scheduler, scheduler_args = StepLR, {'step_size': 2, 'gamma': 0.1}
+    scheduler, scheduler_args = StepLR, {'step_size': 3, 'gamma': 0.5}
 
     system = LightningSystem(model=model,
                              train_data_path='/Users/ar_sabirov/2-Data/kontur_test/train_subs.tsv',
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                              num_workers=0,
                              transforms=transforms,
                              num_classes=2,
-                             batch_size=64,
+                             batch_size=16,
                              collate_fn=PaddingCollateFn())
 
     trainer = Trainer(  # log_save_interval=10,
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         limit_val_batches=0.1,
         # distributed_backend='ddp',
         # gpus=[0],
-        # fast_dev_run=True,
+        fast_dev_run=True,
         # early_stop_callback=early_stop_callback,
         # precision=16,
         # auto_scale_batch_size=True

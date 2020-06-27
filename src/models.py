@@ -109,7 +109,74 @@ class CompareModel(torch.nn.Module):
         output = torch.sigmoid(x)
 
         return output
+    
+class CNN(torch.nn.Module):
+    def __init__(self):
+        torch.nn.Module.__init__(self)
+        self.model = torch.nn.Sequential(
+            torch.nn.Conv2d(in_channels=1,
+                                out_channels=128,
+                                kernel_size=7,
+                                padding=3),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(3),
+            torch.nn.Conv2d(in_channels=128,
+                            out_channels=128,
+                                kernel_size=7,
+                                padding=3),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(3),
+            torch.nn.Conv2d(in_channels=128,
+                                out_channels=128,
+                                kernel_size=3,
+                                padding=1),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(in_channels=128,
+                                out_channels=128,
+                                kernel_size=3,
+                                padding=1),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(in_channels=128,
+                                out_channels=128,
+                                kernel_size=3,
+                                padding=1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(3),
+            torch.nn.Flatten(),
+            torch.nn.Linear(1024, 1024),
+            torch.nn.ReLU(),
+            torch.nn.Linear(1024, 1024)
+        )
+        
+    def forward(self, x):
+        return self.model(x)
 
+
+class ChinatownModel(torch.nn.Module):
+    def __init__(self):
+        torch.nn.Module.__init__(self)
+        self.cnn1 = CNN()
+        self.cnn2 = CNN()
+        
+        self.linear = torch.nn.Linear(2048, 1)
+        
+    def forward(self, x):
+        x_ru, x_en = x
+        
+        x_ru = x_ru[:, None, :, :]        
+        x_ru = self.cnn1(x_ru)
+        
+        x_en = x_en[:, None, :, :]
+        x_en = self.cnn2(x_en)
+        
+        x = torch.cat([x_ru, x_en], dim=1)
+        x = torch.relu(x)
+
+        x = self.linear(x)        
+        
+        return torch.sigmoid(x)
+        
+        
 
 # class Net(torch.nn.Module):
 #     def __init__(self):
