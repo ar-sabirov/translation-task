@@ -20,8 +20,7 @@ class CompanyDataset(Dataset):
         # weights = (self.df.answer * pos_weight) + ~self.df.answer
         # self.weights = torch.from_numpy(weights.values)
         # self.n_pos_samples = int(self.df.answer.sum())
-        
-        self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=10000)
+        self.df = None
 
         self.len = len(pd.read_csv(self.data_path, sep='\t', index_col=0, usecols=[0]))
 
@@ -29,6 +28,9 @@ class CompanyDataset(Dataset):
         return self.len
 
     def __getitem__(self, idx: int):
+        if not self.df:
+            self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=10000)
+        
         if idx not in self.df.index:
             self.df = pd.read_csv(self.data_path,
                                   sep='\t',
