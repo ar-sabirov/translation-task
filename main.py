@@ -34,25 +34,27 @@ if __name__ == "__main__":
     scheduler, scheduler_args = StepLR, {'step_size': 3, 'gamma': 0.5}
 
     system = LightningSystem(model=model,
-                             train_data_path='/Users/ar_sabirov/2-Data/kontur_test/train_subs.tsv',
-                             val_data_path='/Users/ar_sabirov/2-Data/kontur_test/val_subs.tsv',
+                             train_data_path='/root/train_subs.tsv',
+                             val_data_path='/root/val_subs.tsv',
                              loss=loss,
                              optimizer=optimizer,
                              optimizer_args=optimizer_args,
                              scheduler=scheduler,
                              scheduler_args=scheduler_args,
-                             num_workers=0,
+                             num_workers=2,
                              transforms=transforms,
                              num_classes=2,
-                             batch_size=16,
+                             batch_size=128,
                              collate_fn=PaddingCollateFn())
 
-    trainer = Trainer(  # log_save_interval=10,
-        val_check_interval=10,
-        limit_val_batches=0.1,
+    trainer = Trainer(
+        log_save_interval=500,
+        row_log_interval=500,
+        val_check_interval=1000,
+        #limit_val_batches=0.1,
         # distributed_backend='ddp',
-        # gpus=[0],
-        fast_dev_run=True,
+        gpus=1,
+        # fast_dev_run=True,
         # early_stop_callback=early_stop_callback,
         # precision=16,
         # auto_scale_batch_size=True
