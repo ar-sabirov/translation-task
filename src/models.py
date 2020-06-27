@@ -47,10 +47,10 @@ class RNNCNN(torch.nn.Module):
                  rnn_num_layers: int = 1):
         torch.nn.Module.__init__(self)
         
-        self.rnn = torch.nn.LSTM(rnn_input_size,
-                                 rnn_hidden_size,
-                                 rnn_num_layers,
-                                 batch_first=True)
+        # self.rnn = torch.nn.LSTM(rnn_input_size,
+        #                          rnn_hidden_size,
+        #                          rnn_num_layers,
+        #                          batch_first=True)
 
         self.conv1 = torch.nn.Conv2d(in_channels=1,
                                      out_channels=32,
@@ -69,7 +69,7 @@ class RNNCNN(torch.nn.Module):
         self.flatten = torch.nn.Flatten()
 
     def forward(self, x):
-        x, (h_n, c_n) = self.rnn(x)
+        #x, (h_n, c_n) = self.rnn(x)
         x = x[:, None, :, :]
 
         x = self.conv1(x)
