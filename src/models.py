@@ -103,7 +103,9 @@ class CompareModel(torch.nn.Module):
         x = torch.cat([x_ru, x_en], dim=1)
         
         x = self.linear1(x)
+        x = torch.relu(x)
         x = self.linear2(x)
+        x = torch.relu(x)
         
         output = torch.sigmoid(x)
 
