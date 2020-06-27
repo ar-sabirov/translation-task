@@ -146,7 +146,8 @@ class CNN(nn.Module):
             nn.Flatten(),
             nn.Linear(1024, 1024),
             nn.ReLU(inplace=True),
-            nn.Linear(1024, 1024)
+            nn.Linear(1024, 1024),
+            nn.ReLU(inplace=True),
         )
         
     def forward(self, x):
@@ -171,7 +172,6 @@ class ChinatownModel(nn.Module):
         x_en = self.cnn2(x_en)
         
         x = cat([x_ru, x_en], dim=1)
-        x = F.relu(x)
 
         x = self.linear(x)        
         
