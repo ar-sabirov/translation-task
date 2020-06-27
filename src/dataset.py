@@ -25,11 +25,15 @@ class CompanyDataset(Dataset):
 
     def __getitem__(self, idx: int):
         sample = self.df.iloc[idx]
+        
+        ru_name, eng_name, label = sample['ru_name'], sample['eng_name'], sample['answer']
+        
+        fmt = '{:128.128}'
 
         sample = {'idx': idx,
-                  'ru_name': sample['ru_name'],
-                  'eng_name': sample['eng_name'],
-                  'label': float(sample['answer'])}
+                  'ru_name': fmt.format(ru_name),
+                  'eng_name': fmt.format(eng_name),
+                  'label': float(label)}
 
         if self.transform:
             sample = self.transform(sample)

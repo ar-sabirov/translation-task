@@ -39,6 +39,77 @@ class RNN(torch.nn.Module):
 
         return output
 
+
+class RNNCNN(torch.nn.Module):
+    def __init__(self,
+                 rnn_input_size: int = 71,
+                 rnn_hidden_size: int = 64,
+                 rnn_num_layers: int = 1):
+        torch.nn.Module.__init__(self)
+        
+        self.rnn = torch.nn.LSTM(rnn_input_size,
+                                 rnn_hidden_size,
+                                 rnn_num_layers,
+                                 batch_first=True)
+
+        self.conv1 = torch.nn.Conv2d(in_channels=1,
+                                     out_channels=32,
+                                     kernel_size=5,
+                                     stride=2,
+                                     padding=2)
+
+        self.pool = torch.nn.MaxPool2d(2)
+
+        self.conv2 = torch.nn.Conv2d(in_channels=32,
+                                     out_channels=64,
+                                     kernel_size=5,
+                                     stride=2,
+                                     padding=2)
+
+        self.flatten = torch.nn.Flatten()
+
+    def forward(self, x):
+        x, (h_n, c_n) = self.rnn(x)
+        x = x[:, None, :, :]
+
+        x = self.conv1(x)
+        x = torch.relu(x)
+        x = self.pool(x)
+        
+        x = self.conv2(x)
+        x = torch.relu(x)
+        x = self.pool(x)
+
+        return self.flatten(x)
+
+
+class CompareModel(torch.nn.Module):
+    def __init__(self):
+        torch.nn.Module.__init__(self)
+
+        self.rnn_cnn1 = RNNCNN()
+        self.rnn_cnn2 = RNNCNN()
+        
+
+        self.linear1 = torch.nn.Linear(4096, 128)
+        self.linear2 = torch.nn.Linear(128, 1)
+
+    def forward(self, x):
+        ru, en = x
+        
+        x_ru = self.rnn_cnn1(ru)
+        x_en = self.rnn_cnn2(en)
+        
+        x = torch.cat([x_ru, x_en], dim=1)
+        
+        x = self.linear1(x)
+        x = self.linear2(x)
+        
+        output = torch.sigmoid(x)
+
+        return output
+
+
 # class Net(torch.nn.Module):
 #     def __init__(self):
 #         super(Net, self).__init__()

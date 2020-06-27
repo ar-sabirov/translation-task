@@ -4,7 +4,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 from torch.optim.lr_scheduler import StepLR
 
 from src.dataset import PaddingCollateFn
-from src.models import RNN
+from src.models import RNN, CompareModel
 from src.torch.lightning import LightningSystem
 from src.transforms import Lower, OneHotCharacters, Tokenize
 
@@ -18,12 +18,14 @@ if __name__ == "__main__":
     #     verbose=False,
     #     mode='max'
     # )
+    
+    # model = RNN(input_size=71,
+    #             rnn_hidden_size=128,
+    #             rnn_num_layers=2,
+    #             fc_size=64,
+    #             output_size=1)
 
-    model = RNN(input_size=71,
-                rnn_hidden_size=128,
-                rnn_num_layers=2,
-                fc_size=64,
-                output_size=1)
+    model = CompareModel()
 
     loss = torch.nn.BCELoss
 
@@ -42,7 +44,7 @@ if __name__ == "__main__":
                              num_workers=0,
                              transforms=transforms,
                              num_classes=2,
-                             batch_size=16,
+                             batch_size=64,
                              collate_fn=PaddingCollateFn())
 
     trainer = Trainer(  # log_save_interval=10,
