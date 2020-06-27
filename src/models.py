@@ -143,11 +143,7 @@ class CNN(nn.Module):
                                 padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(3),
-            nn.Flatten(),
-            nn.Linear(1024, 1024),
-            nn.ReLU(inplace=True),
-            nn.Linear(1024, 1024),
-            nn.ReLU(inplace=True),
+            nn.Flatten()
         )
         
     def forward(self, x):
@@ -160,7 +156,10 @@ class ChinatownModel(nn.Module):
         self.cnn1 = CNN()
         self.cnn2 = CNN()
         
-        self.linear = nn.Linear(2048, 1)
+        self.linear1 = nn.Linear(2048, 2048)
+        self.linear2 = nn.Linear(2048, 2048)
+        self.linear3 = nn.Linear(2048, 1)
+
         
     def forward(self, x):
         x_ru, x_en = x
@@ -172,8 +171,14 @@ class ChinatownModel(nn.Module):
         x_en = self.cnn2(x_en)
         
         x = cat([x_ru, x_en], dim=1)
+        
+        x = self.linear1(x)
+        x = F.relu(x)
+        
+        x = self.linear2(x)
+        x = F.relu(x)
 
-        x = self.linear(x)        
+        x = self.linear3(x)        
         
         return sigmoid(x)
         
