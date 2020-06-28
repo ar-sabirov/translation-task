@@ -31,6 +31,9 @@ class LightningSystem(pl.LightningModule):
         pl.LightningModule.__init__(self)
         self.model = model
         self.transforms = Compose(transforms)
+        
+        self.train_data_path = train_data_path
+        self.val_data_path = val_data_path
 
         self.criterion = loss()
         self.optimizer = optimizer(self.parameters(), **optimizer_args)
@@ -49,14 +52,14 @@ class LightningSystem(pl.LightningModule):
         self.collate_fn = collate_fn
 
     def prepare_data(self):
-        self.train_dataset = CompanyDataset(data_path=train_data_path,
+        self.train_dataset = CompanyDataset(data_path=self.train_data_path,
                                             transform=self.transforms)
         
         self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
                                                    num_samples=2 * self.train_dataset.n_pos_samples,
                                                    replacement=True)
 
-        self.val_dataset = CompanyDataset(data_path=val_data_path,
+        self.val_dataset = CompanyDataset(data_path=self.val_data_path,
                                           transform=self.transforms)
 
         self.val_sampler = WeightedRandomSampler(weights=self.val_dataset.weights,
