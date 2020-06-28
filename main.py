@@ -1,14 +1,12 @@
 import torch
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from src.dataset import PaddingCollateFn
-from src.torch.models.cnn import ChinatownModel
-from src.torch.lightning import LightningSystem
+from src.lightning import LightningSystem
+from src.models.cnn import ChinatownModel
 from src.transforms import Lower, OneHotCharacters, Tokenize
-
-from pytorch_lightning.callbacks import ModelCheckpoint
 
 if __name__ == "__main__":
     transforms = [Lower(), Tokenize(), OneHotCharacters()]
