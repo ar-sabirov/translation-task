@@ -14,7 +14,6 @@ if __name__ == "__main__":
     transforms = [Lower(), Tokenize(), OneHotCharacters()]
 
     checkpoint_callback = ModelCheckpoint(
-        save_best_only=True,
         verbose=True,
         monitor='val_loss',
         mode='min',
