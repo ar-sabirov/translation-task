@@ -4,33 +4,33 @@ from torch import cat, sigmoid
 
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, out_channels: int):
         nn.Module.__init__(self)
         self.model = nn.Sequential(
             nn.Conv2d(in_channels=1,
-                      out_channels=128,
+                      out_channels=out_channels,
                       kernel_size=7,
                       padding=3),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(3),
-            nn.Conv2d(in_channels=128,
-                      out_channels=128,
+            nn.Conv2d(in_channels=out_channels,
+                      out_channels=out_channels,
                       kernel_size=7,
                       padding=3),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(3),
-            nn.Conv2d(in_channels=128,
-                      out_channels=128,
+            nn.Conv2d(in_channels=out_channels,
+                      out_channels=out_channels,
                       kernel_size=3,
                       padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=128,
-                      out_channels=128,
+            nn.Conv2d(in_channels=out_channels,
+                      out_channels=out_channels,
                       kernel_size=3,
                       padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=128,
-                      out_channels=128,
+            nn.Conv2d(in_channels=out_channels,
+                      out_channels=out_channels,
                       kernel_size=3,
                       padding=1),
             nn.ReLU(inplace=True),
@@ -45,15 +45,17 @@ class CNN(nn.Module):
 class ChinatownModel(nn.Module):
     def __init__(self):
         nn.Module.__init__(self)
-        self.cnn1 = CNN()
-        self.cnn2 = CNN()
+        self.cnn1 = CNN(150)
+        self.cnn2 = CNN(150)
         
         self.fc_layers = nn.Sequential(
-            nn.Linear(2048, 2048),
+            nn.Linear(3000, 3000),
             nn.ReLU(inplace=True),
-            nn.Linear(2048, 2048),
+            #nn.Dropout(0.5),
+            nn.Linear(3000, 3000),
             nn.ReLU(inplace=True),
-            nn.Linear(2048, 1),
+            #nn.Dropout(0.5),
+            nn.Linear(3000, 1),
             nn.Sigmoid()
         )
 

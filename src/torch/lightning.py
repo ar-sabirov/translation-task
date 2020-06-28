@@ -2,11 +2,11 @@ from typing import Optional
 
 import pytorch_lightning as pl
 import torch
-# from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
-#                                                       Recall)
+from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
+                                                      Recall)
 from sklearn.model_selection import GroupShuffleSplit
 from torch.utils.data import DataLoader, Sampler
-#from torch.utils.data.sampler import WeightedRandomSampler
+from torch.utils.data.sampler import WeightedRandomSampler
 from torchvision.transforms import Compose
 
 from src.dataset import CompanyDataset
@@ -38,32 +38,30 @@ class LightningSystem(pl.LightningModule):
 
         self.train_metrics = []
         self.val_metrics = []
-        # self.val_metrics = [
-        #     Accuracy(num_classes=num_classes),
-        #     F1(),
-        #     Precision(),
-        #     Recall()]
+        self.val_metrics = [
+            Accuracy(num_classes=num_classes),
+            F1(),
+            Precision(),
+            Recall()]
 
         self.num_workers = num_workers
-
         self.batch_size = batch_size
-
         self.collate_fn = collate_fn
-        
+
+    def prepare_data(self):
         self.train_dataset = CompanyDataset(data_path=train_data_path,
                                             transform=self.transforms)
-
-        # self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
-        #                                            num_samples=2 * self.train_dataset.n_pos_samples,
-        #                                            replacement=True)
-
+        
+        self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
+                                                   num_samples=2 * self.train_dataset.n_pos_samples,
+                                                   replacement=True)
 
         self.val_dataset = CompanyDataset(data_path=val_data_path,
                                           transform=self.transforms)
 
-        # self.val_sampler = WeightedRandomSampler(weights=self.val_dataset.weights,
-        #                                          num_samples=2 * self.val_dataset.n_pos_samples,
-        #                                          replacement=True)
+        self.val_sampler = WeightedRandomSampler(weights=self.val_dataset.weights,
+                                                 num_samples=2 * self.val_dataset.n_pos_samples,
+                                                 replacement=True)
 
     @staticmethod
     def calc_metrics(y_hat, labels, metrics, prefix):
@@ -119,7 +117,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.train_dataset,
             num_workers=self.num_workers,
-            #sampler=self.train_sampler,
+            sampler=self.train_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
@@ -128,7 +126,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.val_dataset,
             num_workers=self.num_workers,
-            #sampler=self.val_sampler,
+            sampler=self.val_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
@@ -137,4 +135,4 @@ class LightningSystem(pl.LightningModule):
     #     return DataLoader(
     #         self.dataset,
     #         sampler=self.test_sampler,
-    #         batch_size=self.batch_size)def calc_metrics(y_hat, labels, metrics, prefix):
+    #         batch_size=self.batch_size)
