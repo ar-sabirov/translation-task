@@ -43,18 +43,6 @@ class LightningSystem(pl.LightningModule):
         #     F1(num_classes=num_classes),
         #     Precision(num_classes=num_classes),
         #     Recall(num_classes=num_classes)]
-
-    def configure_optimizers(self):
-        optimizer = torch.optim.SGD(self.parameters(),
-                                    lr=0.005,
-                                    momentum=0.9)
-        scheduler = ReduceLROnPlateau(optimizer,
-                                      factor=0.5,
-                                      verbose=True,
-                                      cooldown=1)
-        return [optimizer], [scheduler]
-
-    def prepare_data(self):
         transforms = Compose([Lower(), Tokenize(), OneHotCharacters()])
 
         self.train_dataset = CompanyDataset(data_path=self.train_data,
@@ -71,6 +59,16 @@ class LightningSystem(pl.LightningModule):
             self.test_dataset = CompanyDataset(data_path=self.test_data,
                                                test=True,
                                                transform=transforms)
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.SGD(self.parameters(),
+                                    lr=0.005,
+                                    momentum=0.9)
+        scheduler = ReduceLROnPlateau(optimizer,
+                                      factor=0.5,
+                                      verbose=True,
+                                      cooldown=1)
+        return [optimizer], [scheduler]
 
     @staticmethod
     def _calc_metrics(y_hat, labels, metrics, prefix):
