@@ -30,7 +30,7 @@ if __name__ == "__main__":
         max_epochs=20,
         logger=False,
         distributed_backend='ddp',
-        fast_dev_run=True,
+        #fast_dev_run=True,
         checkpoint_callback=checkpoint_callback
     )
 
