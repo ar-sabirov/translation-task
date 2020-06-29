@@ -18,4 +18,4 @@ def _get_vocab():
 
 def save_predictions(pred_arr):
     df_res = pd.DataFrame(pred_arr, columns=['answer'], dtype=bool)
-    df_res.to_csv('result.tsv', sep='\t', index=None)
+    df_res.to_csv('test_result.tsv', sep='\t', index=None)
