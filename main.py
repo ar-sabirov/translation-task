@@ -1,9 +1,8 @@
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-from src.torch.lightning import LightningSystem
-
-from src.torch.models.cnn import ChinatownModel
+from src.lightning import LightningSystem
+from src.models.cnn import ChinatownModel
 
 if __name__ == "__main__":
     checkpoint_callback = ModelCheckpoint(
@@ -34,7 +33,7 @@ if __name__ == "__main__":
         # early_stop_callback=early_stop_callback,
         # precision=16,
         # auto_scale_batch_size=True
-        # checkpoint_callback=checkpoint_callback
+        checkpoint_callback=checkpoint_callback
     )
 
     trainer.fit(system)

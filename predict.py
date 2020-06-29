@@ -1,8 +1,8 @@
-from src.torch.lightning import LightningSystem
+import torch
 from pytorch_lightning import Trainer
 
-from src.torch.models.cnn import ChinatownModel
-import torch
+from src.lightning import LightningSystem
+from src.models.cnn import ChinatownModel
 
 if __name__ == "__main__":
     path = '/Users/ar_sabirov/1-Code/translation-task/lightning_logs/version_0/checkpoints/epoch=1.ckpt'
