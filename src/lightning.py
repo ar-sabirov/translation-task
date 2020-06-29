@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
-                                                      Recall)
+# from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
+#                                                       Recall)
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import WeightedRandomSampler
 from torchvision.transforms import Compose
@@ -37,11 +37,12 @@ class LightningSystem(pl.LightningModule):
 
         self.train_metrics = []
         self.val_metrics = []
-        self.val_metrics = [
-            Accuracy(num_classes=num_classes),
-            F1(num_classes=num_classes),
-            Precision(num_classes=num_classes),
-            Recall(num_classes=num_classes)]
+        self.val_metrics = []
+        # self.val_metrics = [
+        #     Accuracy(num_classes=num_classes),
+        #     F1(num_classes=num_classes),
+        #     Precision(num_classes=num_classes),
+        #     Recall(num_classes=num_classes)]
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(),
