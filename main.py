@@ -5,7 +5,6 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 from src.lightning import LightningSystem
 from src.models.cnn import ChinatownModel
-from pytorch_lightning.loggers import WandbLogger
 
 if __name__ == "__main__":
     checkpoint_callback = ModelCheckpoint(
@@ -15,8 +14,6 @@ if __name__ == "__main__":
         period=1,
         save_weights_only=True
     )
-    
-    logger = WandbLogger()
     
     model = ChinatownModel()
 
@@ -30,7 +27,8 @@ if __name__ == "__main__":
         # log_save_interval=1000,
         # row_log_interval=1000,
         gpus=-1,
-        logger=logger,
+        max_epochs=20,
+        logger=False,
         distributed_backend='ddp',
         fast_dev_run=True,
         checkpoint_callback=checkpoint_callback
