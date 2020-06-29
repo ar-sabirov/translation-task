@@ -43,19 +43,19 @@ class CNN(nn.Module):
 
 
 class ChinatownModel(nn.Module):
-    def __init__(self):
+    def __init__(self, cnn_channels: int):
         nn.Module.__init__(self)
-        self.cnn1 = CNN(150)
-        self.cnn2 = CNN(150)
+        self.cnn1 = CNN(cnn_channels)
+        self.cnn2 = CNN(cnn_channels)
         
         self.fc_layers = nn.Sequential(
-            nn.Linear(3000, 1500),
+            nn.Linear(3000, 3000),
             nn.ReLU(inplace=True),
             #nn.Dropout(0.5),
-            nn.Linear(1500, 512),
+            nn.Linear(3000, 3000),
             nn.ReLU(inplace=True),
             #nn.Dropout(0.5),
-            nn.Linear(512, 1),
+            nn.Linear(3000, 1),
             nn.Sigmoid()
         )
 

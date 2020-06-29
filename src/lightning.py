@@ -2,13 +2,13 @@ import pytorch_lightning as pl
 import torch
 from pytorch_lightning.metrics.classification import (F1, Accuracy, Precision,
                                                       Recall)
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import WeightedRandomSampler
 from torchvision.transforms import Compose
 
 from src.dataset import CompanyDataset, PaddingCollateFn
 from src.transforms import Lower, OneHotCharacters, Tokenize
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from src.util import save_predictions
 
 
@@ -58,9 +58,9 @@ class LightningSystem(pl.LightningModule):
         self.train_dataset = CompanyDataset(data_path=self.train_data,
                                             transform=transforms)
 
-        # self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
-        #                                            num_samples=2 * self.train_dataset.n_pos_samples,
-        #                                            replacement=True)
+        self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
+                                                   num_samples=2 * self.train_dataset.n_pos_samples,
+                                                   replacement=True)
 
         self.val_dataset = CompanyDataset(data_path=self.val_data,
                                           transform=transforms)
@@ -150,7 +150,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.train_dataset,
             num_workers=self.num_workers,
-            #sampler=self.train_sampler,
+            sampler=self.train_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 

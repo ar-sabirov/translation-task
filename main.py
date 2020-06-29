@@ -16,13 +16,7 @@ if __name__ == "__main__":
         save_weights_only=True
     )
     
-    path = '/root/epoch_41.ckpt'
-    checkpoint = torch.load(path)
-    
-    d = {'.'.join(k.split('.')[1:]) : v for k,v in checkpoint['state_dict'].items()}
-    
-    model = ChinatownModel()
-    model.load_state_dict(d)
+    model = ChinatownModel(150)
 
     system = LightningSystem(model=model,
                              train_data='/root/train_subs.tsv',

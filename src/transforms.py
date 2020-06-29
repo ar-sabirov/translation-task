@@ -1,6 +1,6 @@
+import torch
 from nltk.tokenize import RegexpTokenizer
 
-import torch
 from src.util import _get_vocab
 
 
@@ -37,9 +37,6 @@ class OneHotCharacters:
     def _inputTensor(line, vocab):
         tensor = torch.zeros(len(line), len(vocab))
         for i, letter in enumerate(line):
-            try:
-                pos = vocab[letter]
-            except KeyError:
-                pos = vocab[' ']
+            pos = vocab.get(letter, 0)
             tensor[i][pos] = 1
         return tensor
