@@ -1,63 +1,40 @@
-import torch
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import EarlyStopping
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-
-from src.dataset import PaddingCollateFn
-from src.torch.models.cnn import ChinatownModel
-from src.torch.lightning import LightningSystem
-from src.transforms import Lower, OneHotCharacters, Tokenize
-
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-if __name__ == "__main__":
-    transforms = [Lower(), Tokenize(), OneHotCharacters()]
+from src.torch.lightning import LightningSystem
 
+from src.torch.models.cnn import ChinatownModel
+
+if __name__ == "__main__":
     checkpoint_callback = ModelCheckpoint(
         verbose=True,
         monitor='val_loss',
         mode='min',
-        period=5
+        period=1,
+        save_top_k=3,
+        save_weights_only=True
     )
-
+    
     model = ChinatownModel()
 
-    loss = torch.nn.BCELoss
-
-    optimizer, optimizer_args = torch.optim.SGD, {'lr': 0.01, 'momentum': 0.9}
-
-    scheduler, scheduler_args = ReduceLROnPlateau, {'factor': 0.5,
-                                                    'patience': 5,
-                                                    'threshold': 1e-3,
-                                                    'verbose': True,
-                                                    'cooldown': 1}
-
     system = LightningSystem(model=model,
-                             train_data_path='/root/train_subs.tsv',
-                             val_data_path='/root/val_subs.tsv',
-                             loss=loss,
-                             optimizer=optimizer,
-                             optimizer_args=optimizer_args,
-                             scheduler=scheduler,
-                             scheduler_args=scheduler_args,
-                             num_workers=1,
-                             transforms=transforms,
-                             num_classes=2,
-                             batch_size=128,
-                             collate_fn=PaddingCollateFn(150))
+                             train_data='/Users/ar_sabirov/2-Data/kontur_test/train_subs.tsv',
+                             val_data='/Users/ar_sabirov/2-Data/kontur_test/val_subs.tsv',
+                             test_data='/Users/ar_sabirov/2-Data/kontur_test/test_task/test_data.tsv',
+                             batch_size=2)
 
     trainer = Trainer(
-        log_save_interval=1000,
+        log_save_interval=1,
         row_log_interval=1000,
-        #val_check_interval=1000,
-        #limit_val_batches=0.1,
+        # val_check_interval=1000,
+        # limit_val_batches=0.1,
         # distributed_backend='ddp',
-        gpus=1,
-        # fast_dev_run=True,
+        # gpus=1 ,
+        fast_dev_run=True,
         # early_stop_callback=early_stop_callback,
         # precision=16,
         # auto_scale_batch_size=True
-        checkpoint_callback=checkpoint_callback
+        # checkpoint_callback=checkpoint_callback
     )
 
     trainer.fit(system)
