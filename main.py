@@ -24,8 +24,8 @@ if __name__ == "__main__":
                              batch_size=256)
 
     trainer = Trainer(
-        log_save_interval=1000,
-        row_log_interval=1000,
+        # log_save_interval=1000,
+        # row_log_interval=1000,
         gpus=-1,
         distributed_backend='ddp',
         fast_dev_run=True,
