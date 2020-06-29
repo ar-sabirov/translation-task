@@ -27,7 +27,7 @@ if __name__ == "__main__":
                              train_data='/root/train_subs.tsv',
                              val_data='/root/val_subs.tsv',
                              test_data=None,
-                             batch_size=256)
+                             batch_size=128)
 
     trainer = Trainer(
         # log_save_interval=1000,
