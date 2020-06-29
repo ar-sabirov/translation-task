@@ -1,3 +1,5 @@
+import torch
+
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 
@@ -14,7 +16,13 @@ if __name__ == "__main__":
         save_weights_only=True
     )
     
+    path = '/root/epoch_41.ckpt'
+    checkpoint = torch.load(path)
+    
+    d = {'.'.join(k.split('.')[1:]) : v for k,v in checkpoint['state_dict'].items()}
+    
     model = ChinatownModel()
+    model.load_state_dict(d)
 
     system = LightningSystem(model=model,
                              train_data='/root/train_subs.tsv',
@@ -25,7 +33,7 @@ if __name__ == "__main__":
     trainer = Trainer(
         log_save_interval=1,
         row_log_interval=1000,
-        gpus=1 ,
+        gpus=1,
         fast_dev_run=True,
         checkpoint_callback=checkpoint_callback
     )
