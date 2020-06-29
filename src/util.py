@@ -3,7 +3,8 @@ import pandas as pd
 
 def _get_vocab():
 
-    def get_chars(lower, upper):
+    def get_chars(lower: str,
+                  upper: str):
         low_i = ord(lower)
         up_i = ord(upper)
         return ''.join([chr(i) for i in range(low_i, up_i + 1)])

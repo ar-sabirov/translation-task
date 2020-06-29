@@ -15,19 +15,19 @@ from src.util import save_predictions
 class LightningSystem(pl.LightningModule):
 
     def __init__(self,
-                 model,
-                 train_data,
-                 val_data,
-                 test_data,
-                 batch_size,
-                 num_classes=2,
-                 num_workers=1):
+                 model: torch.nn.Module,
+                 train_data: str,
+                 val_data: str,
+                 test_data: str,
+                 batch_size: int,
+                 num_classes: int = 2,
+                 num_workers: int = 1):
         super().__init__()
         self.num_workers = num_workers
-        self.train_data=train_data
-        self.val_data=val_data
-        self.test_data= test_data
-        self.batch_size=batch_size
+        self.train_data = train_data
+        self.val_data = val_data
+        self.test_data = test_data
+        self.batch_size = batch_size
 
         self.model = model
 
@@ -138,7 +138,7 @@ class LightningSystem(pl.LightningModule):
             labels = torch.cat([x['labels'] for x in outputs])
             test_metrics = self._calc_metrics(
                 preds, labels.to(torch.long), self.val_metrics, 'test')
-        
+
         preds_arr = preds.detach().cpu().numpy()
 
         save_predictions(preds_arr)

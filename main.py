@@ -16,7 +16,7 @@ if __name__ == "__main__":
         save_weights_only=True
     )
     
-    model = ChinatownModel(150)
+    model = ChinatownModel()
 
     system = LightningSystem(model=model,
                              train_data='/root/train_subs.tsv',

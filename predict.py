@@ -7,9 +7,10 @@ from src.models.cnn import ChinatownModel
 if __name__ == "__main__":
     path = '/root/epoch_41.ckpt'
     checkpoint = torch.load(path)
-    
-    d = {'.'.join(k.split('.')[1:]) : v for k,v in checkpoint['state_dict'].items()}
-    
+
+    d = {'.'.join(k.split('.')[1:]): v for k,
+         v in checkpoint['state_dict'].items()}
+
     model = ChinatownModel()
     model.load_state_dict(d)
 
@@ -20,5 +21,5 @@ if __name__ == "__main__":
                              batch_size=128)
 
     trainer = Trainer(gpus=1)
-    
+
     trainer.test(system)
