@@ -16,7 +16,6 @@ if __name__ == "__main__":
     )
     
     model = ChinatownModel()
-    model.load_state_dict(d)
 
     system = LightningSystem(model=model,
                              train_data='/root/train_subs.tsv',
