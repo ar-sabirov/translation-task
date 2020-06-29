@@ -22,9 +22,13 @@ if __name__ == "__main__":
 
     loss = torch.nn.BCELoss
 
-    optimizer, optimizer_args = torch.optim.SGD, {'lr': 0.005, 'momentum': 0.9}
+    optimizer, optimizer_args = torch.optim.SGD, {'lr': 0.01, 'momentum': 0.9}
 
-    scheduler, scheduler_args = ReduceLROnPlateau, {'factor': 0.5, 'verbose': True, 'cooldown': 1}
+    scheduler, scheduler_args = ReduceLROnPlateau, {'factor': 0.5,
+                                                    'patience': 5,
+                                                    'threshold': 1e-3,
+                                                    'verbose': True,
+                                                    'cooldown': 1}
 
     system = LightningSystem(model=model,
                              train_data_path='/root/train_subs.tsv',
@@ -43,11 +47,11 @@ if __name__ == "__main__":
     trainer = Trainer(
         log_save_interval=1000,
         row_log_interval=1000,
-        val_check_interval=1000,
+        #val_check_interval=1000,
         #limit_val_batches=0.1,
         # distributed_backend='ddp',
         gpus=1,
-        fast_dev_run=True,
+        # fast_dev_run=True,
         # early_stop_callback=early_stop_callback,
         # precision=16,
         # auto_scale_batch_size=True

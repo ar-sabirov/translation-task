@@ -129,7 +129,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.val_dataset,
             num_workers=self.num_workers,
-            sampler=self.val_sampler,
+            # sampler=self.val_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
