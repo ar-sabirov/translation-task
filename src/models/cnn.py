@@ -49,13 +49,13 @@ class ChinatownModel(nn.Module):
         self.cnn2 = CNN(150)
         
         self.fc_layers = nn.Sequential(
-            nn.Linear(3000, 3000),
+            nn.Linear(3000, 1500),
             nn.ReLU(inplace=True),
             #nn.Dropout(0.5),
-            nn.Linear(3000, 3000),
+            nn.Linear(1500, 512),
             nn.ReLU(inplace=True),
             #nn.Dropout(0.5),
-            nn.Linear(3000, 1),
+            nn.Linear(512, 1),
             nn.Sigmoid()
         )
 

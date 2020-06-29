@@ -59,9 +59,9 @@ class LightningSystem(pl.LightningModule):
         self.train_dataset = CompanyDataset(data_path=self.train_data,
                                             transform=transforms)
 
-        self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
-                                                   num_samples=2 * self.train_dataset.n_pos_samples,
-                                                   replacement=True)
+        # self.train_sampler = WeightedRandomSampler(weights=self.train_dataset.weights,
+        #                                            num_samples=2 * self.train_dataset.n_pos_samples,
+        #                                            replacement=True)
 
         self.val_dataset = CompanyDataset(data_path=self.val_data,
                                           transform=transforms)
@@ -142,7 +142,7 @@ class LightningSystem(pl.LightningModule):
         return DataLoader(
             self.train_dataset,
             num_workers=self.num_workers,
-            sampler=self.train_sampler,
+            #sampler=self.train_sampler,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
 
