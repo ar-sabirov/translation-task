@@ -20,6 +20,7 @@ class LightningSystem(pl.LightningModule):
                  val_data,
                  test_data,
                  batch_size,
+                 num_classes=2,
                  num_workers=1):
         super().__init__()
         self.num_workers = num_workers
@@ -37,10 +38,10 @@ class LightningSystem(pl.LightningModule):
         self.train_metrics = []
         self.val_metrics = []
         self.val_metrics = [
-            Accuracy(num_classes=2),
-            F1(reduction=None),
-            Precision(reduction=None),
-            Recall(reduction=None)]
+            Accuracy(num_classes=num_classes),
+            F1(num_classes=num_classes),
+            Precision(num_classes=num_classes),
+            Recall(num_classes=num_classes)]
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(),
