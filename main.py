@@ -20,11 +20,11 @@ if __name__ == "__main__":
     system = LightningSystem(model=model,
                              train_data='/root/train_subs.tsv',
                              val_data='/root/val_subs.tsv',
-                             test_data='/root/test_data.tsv',
-                             batch_size=128)
+                             test_data=None,
+                             batch_size=256)
 
     trainer = Trainer(
-        log_save_interval=1,
+        log_save_interval=1000,
         row_log_interval=1000,
         gpus=-1,
         distributed_backend='ddp',

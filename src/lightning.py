@@ -18,8 +18,8 @@ class LightningSystem(pl.LightningModule):
                  model,
                  train_data,
                  val_data,
-                 test_data,
                  batch_size,
+                 test_data = None,
                  num_classes=2,
                  num_workers=1):
         super().__init__()
