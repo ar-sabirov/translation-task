@@ -17,22 +17,16 @@ if __name__ == "__main__":
     model = ChinatownModel()
 
     system = LightningSystem(model=model,
-                             train_data='/Users/ar_sabirov/2-Data/kontur_test/train_subs.tsv',
-                             val_data='/Users/ar_sabirov/2-Data/kontur_test/val_subs.tsv',
-                             test_data='/Users/ar_sabirov/2-Data/kontur_test/test_task/test_data.tsv',
-                             batch_size=2)
+                             train_data='/root/train_subs.tsv',
+                             val_data='/root/val_subs.tsv',
+                             test_data='/root/test_data.tsv',
+                             batch_size=128)
 
     trainer = Trainer(
-        log_save_interval=1,
+        log_save_interval=1000,
         row_log_interval=1000,
-        # val_check_interval=1000,
-        # limit_val_batches=0.1,
-        # distributed_backend='ddp',
-        # gpus=1 ,
+        gpus=1 ,
         fast_dev_run=True,
-        # early_stop_callback=early_stop_callback,
-        # precision=16,
-        # auto_scale_batch_size=True
         checkpoint_callback=checkpoint_callback
     )
 
