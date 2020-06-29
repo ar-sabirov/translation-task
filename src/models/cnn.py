@@ -43,7 +43,7 @@ class CNN(nn.Module):
 
 
 class ChinatownModel(nn.Module):
-    def __init__(self, cnn_channels: int):
+    def __init__(self):
         nn.Module.__init__(self)
         self.cnn1 = CNN(150)
         self.cnn2 = CNN(150)

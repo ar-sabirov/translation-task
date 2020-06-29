@@ -11,7 +11,7 @@ class CompanyDataset(Dataset):
                  data_path: str,
                  transform=None,
                  test: bool = False,
-                 nrows: int: Optional[int] = None):
+                 nrows: Optional[int] = None):
         self.df = pd.read_csv(data_path, sep='\t', index_col=0, nrows=nrows)
         self.transform = transform
         self.test = test

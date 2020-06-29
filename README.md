@@ -1,6 +1,11 @@
 # translation-task
 pip install -r requirements.txt    
 
-python train.py - обучение, в файле нужно прописать пути    
+В процессе экспериментирования данные было удобнее разбить на train/val в отдельных файлах:     
+python split_data.py --path /path/to/train_data.tsv
 
-python predict.py - предсказания, нужен путь до чекпоинта    
+Запуск тренировочной процедуры:    
+python train.py    
+
+Запуск предсказания test-set'а:    
+python predict.py --test-path /path/to/test_data.tsv --checkpoint-path /path/to/checkpoint.ckpt
