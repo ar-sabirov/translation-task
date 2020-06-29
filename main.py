@@ -23,7 +23,7 @@ if __name__ == "__main__":
                              batch_size=128)
 
     trainer = Trainer(
-        log_save_interval=1000,
+        log_save_interval=1,
         row_log_interval=1000,
         gpus=1 ,
         fast_dev_run=True,

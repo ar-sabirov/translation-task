@@ -1,15 +1,20 @@
-import torch
+import pandas as pd
 
-def f1_score(y_true, y_pred):
-    tp = (y_true * y_pred).sum().to(torch.float)
-    tn = ((1 - y_true) * (1 - y_pred)).sum().to(torch.float)
-    fp = ((1 - y_true) * y_pred).sum().to(torch.float)
-    fn = (y_true * (1 - y_pred)).sum().to(torch.float)
-    
-    epsilon = 1e-7
-    
-    precision = tp / (tp + fp + epsilon)
-    recall = tp / (tp + fn + epsilon)
-    
-    f1 = 2* (precision*recall) / (precision + recall + epsilon)
-    return f1
+
+def _get_vocab():
+
+    def get_chars(lower, upper):
+        low_i = ord(lower)
+        up_i = ord(upper)
+        return ''.join([chr(i) for i in range(low_i, up_i + 1)])
+
+    bounds = [('а', 'я'), ('a', 'z'), ('0', '9')]
+
+    letters = [' ё_'] + [get_chars(a, b) for a, b in bounds]
+
+    return {a: i for i, a in enumerate(''.join(letters))}
+
+
+def save_predictions(pred_arr):
+    df_res = pd.DataFrame(pred_arr, columns=['answer'], dtype=bool)
+    df_res.to_csv('result.tsv', sep='\t', index=None)
