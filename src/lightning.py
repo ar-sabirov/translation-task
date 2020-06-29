@@ -38,10 +38,9 @@ class LightningSystem(pl.LightningModule):
         self.val_metrics = []
         self.val_metrics = [
             Accuracy(num_classes=2),
-            # AUROC(),
-            F1(),
-            Precision(),
-            Recall()]
+            F1(reduction=None),
+            Precision(reduction=None),
+            Recall(reduction=None)]
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(),
