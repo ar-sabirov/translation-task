@@ -36,7 +36,6 @@ class LightningSystem(pl.LightningModule):
         self.collate_fn = PaddingCollateFn(150)
 
         self.train_metrics = []
-        self.val_metrics = []
         self.val_metrics = [
             Accuracy(num_classes=num_classes),
             F1(num_classes=num_classes),
@@ -127,15 +126,24 @@ class LightningSystem(pl.LightningModule):
         y_hat = self.forward(inputs)
         preds = (y_hat > 0.5).to(dtype=torch.long)
 
-        return {'preds': preds}
+        output = {'preds': preds}
+        if labels is not None:
+            output['labels'] = labels
+        return output
 
     def test_epoch_end(self, outputs):
         preds = torch.cat([x['preds'] for x in outputs])
+        test_metrics = {}
+        if 'labels' in outputs[0].keys():
+            labels = torch.cat([x['labels'] for x in outputs])
+            test_metrics = self._calc_metrics(
+                preds, labels.to(torch.long), self.val_metrics, 'test')
+        
         preds_arr = preds.detach().cpu().numpy()
 
         save_predictions(preds_arr)
 
-        return {}
+        return test_metrics
 
     @pl.data_loader
     def train_dataloader(self):
@@ -158,7 +166,7 @@ class LightningSystem(pl.LightningModule):
     def test_dataloader(self):
         assert self.test_data, 'Please provide test data for testing'
         return DataLoader(
-            self.test_dataset,
+            self.val_dataset,
             num_workers=self.num_workers,
             collate_fn=self.collate_fn,
             batch_size=self.batch_size)
